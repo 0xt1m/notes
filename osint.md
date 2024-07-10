@@ -1,0 +1,11 @@
+# OSINT
+- https://www.google.com/advanced_search
+- https://www.exploit-db.com/google-hacking-database
+- https://instantusername.com/
+- https://pipl.com/
+- https://www.spokeo.com/
+- https://osintframework.com/
+- https://shodan.io
+- https://urlscan.io/
+- https://archive.org/
+- https://jimpl.com/
