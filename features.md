@@ -7,9 +7,6 @@ stty raw -echo && fg
 reset
 xterm
 ```
-### Nmap
-`-min-rate=10000` to speed up `nmap` scan.
-
 
 ### spawn a reverse-shell
 ```
