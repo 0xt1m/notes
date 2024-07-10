@@ -9,33 +9,44 @@
 ## Knowledge Objects {#knowledge-objects}
 *Help you to discover and analyze your data.*
 
-- Fields
-    - Building blocks of the splunk search
-- Field extractions
-    - You can extract fields from raw data using regex or delimiters
-- Field aliases
-    - You can give alternate names to some fields to make your search more comfortable.
-- Calculated Fields
-    - Perform calculations based on the values of exsiting fields.
-- Lookups
-    - Additional fields can be added to your data using lookups.
-- Event types
-    - You can save your search as an Event Type.
-    - Provide a way to help you categorize your data.
-- Tags
-    - Save key:value pairs. Labels for data.
-- Workflow Actions
-    - Provide links within events that interact with external resources or narrow our search. 
-    - Use `GET` or `POST` method to pass information or pass information back to Splunk to permorm a secondary search.
-- Reports
-    - You can save searches that you run repeatedly to reports.
-- Alerts
-    - Get a notification when certain conditions are met.
-- Macros
-    - Frequently used searches saved to kind of functions where you can also pass arguments.
-- [Data Models](#data-model)
-    - Hierarchically structured datasets that can consist of three types of datasets. Events. Searches. `AND`, `OR` transactions.
-    - Explore data in a graphical interface.
+Fields
+: Building blocks of the splunk search
+
+Field extractions
+: You can extract fields from raw data using regex or delimiters
+
+Field aliases
+: You can give alternate names to some fields to make your search more comfortable.
+
+Calculated Fields
+: Perform calculations based on the values of exsiting fields.
+
+Lookups
+: Additional fields can be added to your data using lookups.
+
+Event types
+: You can save your search as an Event Type.
+: Provide a way to help you categorize your data.
+
+Tags
+: Save key:value pairs. Labels for data.
+
+Workflow Actions
+: Provide links within events that interact with external resources or narrow our search. 
+: Use `GET` or `POST` method to pass information or pass information back to Splunk to permorm a secondary search.
+
+Reports
+: You can save searches that you run repeatedly to reports.
+
+Alerts
+: Get a notification when certain conditions are met.
+
+Macros
+: Frequently used searches saved to kind of functions where you can also pass arguments.
+
+[Data Models](#data-model)
+: Hierarchically structured datasets that can consist of three types of datasets. Events. Searches. `AND`, `OR` transactions.
+: Explore data in a graphical interface.
 
 ---
 
@@ -49,7 +60,7 @@
 5. Time
 6. Description
 
-*Example:*
+**Example:**
 *Security-Focused Workflow Action* for *Operations team* that returns *information about user's IP*: 
 ```
 OPS_WFA_Network_Security_na_IPwhoisAction
@@ -61,6 +72,8 @@ Security      = Category
 na            = Time (not time based in this case)
 IPwhoisAction = Description
 ```
+
+---
 
 ### Permissions {#permissions}
 Private
