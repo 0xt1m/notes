@@ -1,11 +1,11 @@
 # Nmap
 
-- **Gives services and their versions:**
+- **Gives services and their versions**
 ```
 nmap -sC -sV <ip>
 ```
 
-- **Scan all the ports:**
+- **Scan all the ports**
 ```
 nmap -p- <ip>
 ```
