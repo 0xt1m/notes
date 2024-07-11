@@ -298,23 +298,101 @@ We can use `Throttle` setting to suppress a few actions into one alert (like ema
 Alerts are **private** by default.
 (Similar to reports)
 
+---
 
-## Notes from Notebook
-### Data Model {#data-model}
-A model to associate specific types to.
-Data model :arrow_right: Data set :arrow_right: subset.
+## Visualizations
+### Formatting Commands
+#### `| fields`
+Allows you to include or exclude specific fields from search results and fields list.
+```
+| fields product_name price
+# To include fields
+# Those will the only returned fields
+```
+```
+| fields - product_name price
+# To exclude fields
+```
+==Limiting fields can make your searches more efficient==
 
-### CIM {#cim}
-Common Information model.
-A model. Data normalization.
+#### `| table`
+Similar to fields command, but will display a table.
+```
+| table JESSIONID price product_name
+# To draw a table
+```
+We can use `fields` command and `table` command together to improve efficiency of the search.
 
-### Lookup {#lookup}
-Adding data from external sources.
+#### `| dedup`
+Removes duplicate events from the results that share common values.
+```
+| fields JESSIONID price product_name
+| table JESSIONID price product_name
+| dedup JESSIONID
+
+# We can dedup by several fields by just adding it to the same dedup command
+```
+
+#### `| addtotals`
+Computes the sum of all numeric fields for each row and create a total column.
+```
+...
+| chart sum(price) over product_name by VendorCountry
+| addtotals col=True label="Total Sales" labelfield="product_name" fieldname="Total By Product"  
+```
+
+#### `| fieldformat`
+Format the appearance of values without making a change to the underlying raw data.
+```
+index=sales sourcetype=vendor_sales product_name=*
+| stats sum(price) as Total by product_name
+| addtotals col=t label="Total Sales" labelfield="product_name"
+| fieldformat Total = "$" + tostring(Total, "commas")
+```
 
 ---
 
-### Transforming commands {#transforming-commands}
+### Visualizing Data
+Any search that returns statistical values can be viewed as a chart.
+
+**Most visualizations require result structure as tables with at least to columns.**
+The first columns provides the `x` axes values and the second column provides the `y`.
+
+#### Transforming commands
+Order search results into a data table. They can be used for a statistical purposes.
+We will need them to if we wanna transform our search results into visualization.
 Take data through `|` symbol and transform it.
+
+##### `| top`
+*Finds the most common values of given fields in the results.*
+Automatically returns *count* and *percent* columns.
+We can use the `top` command for multiply fields at the same time.
+
+Default `limit=10`, `limit=0` to get all results.
+:point_down:To change names: 
+`countfield = string`
+`percentfield = string`
+
+:point_down:To show or hide columns: 
+`showcount = true/false`
+`showperc = true/false`
+
+:point_down:To add a row of count numbers for results not within the limits. 
+`showother = true/false`
+`otherstr = string`
+
+```
+index=sales sourcetype=vendor_sales
+| top Vendor limit=5 showperc=false countfield="Number of Sales" showother=true
+```
+
+Using `by` with `top`:
+```
+index=sales sourcetype=vendor_sales
+| top product_name by Vendor limit=3 showperc=false countfield="Number of Sales" showother=false
+# It will show the top 3 product sales by each vendor
+```
+
 - `stats`
     - `count`
     - `sum`, `avg`, `max`, `min`
@@ -333,3 +411,16 @@ Take data through `|` symbol and transform it.
 ```
 index=* | stats count by purchase
 ```
+
+
+## Notes from Notebook
+### Data Model {#data-model}
+A model to associate specific types to.
+Data model :arrow_right: Data set :arrow_right: subset.
+
+### CIM {#cim}
+Common Information model.
+A model. Data normalization.
+
+### Lookup {#lookup}
+Adding data from external sources.
