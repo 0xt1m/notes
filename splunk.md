@@ -12,6 +12,9 @@
     - [`| eval`](#eval-command)
     - [Field Extraction](#field-extraction)
     - [Enriching Data With Knowledge Objects](#enriching-data-ko)
+- [Scheduling Reports & Alerts](#reports-alerts)
+    - [Reports](#reports)
+    - [Alerts](#alerts)
 
 ---
 
@@ -23,11 +26,11 @@
 | Fields | Building blocks of the splunk search |
 | Field extractions | You can extract fields from raw data using regex or delimiters |
 | Field aliases | You can give alternate names to some fields to make your search more comfortable. |
-| Calculated Fields | Perform calculations based on the values of exsiting fields. |
+| Calculated Fields | Perform calculations based on the values of existing fields. |
 | Lookups | Additional fields can be added to your data using lookups. |
 | Event types | 1. You can save your search as an Event Type.<br>2.Provide a way to help you categorize your data. |
 | Tags | Save key:value pairs. Labels for data. |
-| Workflow Actions | 1. Provide links within events that interact with external resources or narrow our search. <br>2. Use `GET` or `POST` method to pass information or pass information back to Splunk to permorm a secondary search. |
+| Workflow Actions | 1. Provide links within events that interact with external resources or narrow our search. <br>2. Use `GET` or `POST` method to pass information or pass information back to Splunk to perform a secondary search. |
 | Reports | You can save searches that you run repeatedly to reports. |
 | Alerts | Get a notification when certain conditions are met. |
 | Macros | Frequently used searches saved to kind of functions where you can also pass arguments. |
@@ -119,15 +122,15 @@ index=web status IN ("500", "503", "505")
 ```
 `| fields` in this case makes the search more efficient 
 
-Use `+` or `-` before a field name to include or exclude a field (defualt is `+`).
+Use `+` or `-` before a field name to include or exclude a field (default is `+`).
 Filtering fields as early as possible is the best practice.
 
 ---
 
 ### `| rename` {#rename-command}
 Used to rename field in your search.
-You can give more meaningful or userfriendly names to your fields.
-==Once you've used rename command the original field name would no longer be avaliable==
+You can give more meaningful or user friendly names to your fields.
+==Once you've used rename command the original field name would no longer be available==
 ```
 index=web status IN ("500", "503", "505")
 | fields status
@@ -199,6 +202,102 @@ Allow you to add other fields and values to your events that are not a part of y
 Field Extractions :arrow_right: Field Aliases :arrow_right: Calculated Fields :arrow_right: Lookups :arrow_right: Event Types :arrow_right: Tags
 
 ---
+
+## Scheduling Reports & Alerts {#reports-alerts}
+### Reports {#reports}
+It is basically a search string that runs on a scheduled intervals.
+
+Runs on a scheduled interval. Every time a scheduled report is run it can automatically send an email or trigger different actions.
+It can also be used to power dashboard panel.
+
+Running concurrent reports, and the search behind them, can put a big demand on your system hardware, even if everything is configured to the recommended specs.
+
+Splunk allow us to set **Schedule Priority**.
+We can set a set **Schedule Window** when they may run.
+
+**Schedule Priority** is only accessible to admin users.
+
+**Priority levels:**
+1. Default
+2. Higher
+3. Highest
+
+Include a **Schedule Window** only if the report doesn't have to start at a specific time and you are okay with they delay.
+
+| Action                                | Description                                           |
+----------------------------------------|-------------------------------------------------------|
+| Log Event                             | Send log event to Splunk receiver end point           |
+| Output results to lookup              | Output the results of the search to a CSV lookup file |
+| Output results to telemetry endpoint  | Custom action to output results to telemetry endpoint |
+| Run a script                          | Invoke a custom script                                |
+| Send email                            | Send an email notification to specified recipients    |
+| Webhook                               | Generic `HTTP POST` to a specified URL                |
+
+#### Managing Reports
+We can edit: Search string, permissions, schedule, acceleration, summery indexing.
+We can also disable, clone, embed, move, or delete a report.
+
+- Users with the `power` role are able to display the report for themselves or to the other users of the app.
+- Users with the `admin` role are able to display the report in all apps.
+
+Embeding
+: Getting html code to display a report on a web page.
+
+Once embeding is enabled, we will no longer be able to edit attributes for the report.
+
+We can add scheduled report to a dashboard.
+
+---
+
+### Alerts {#alerts}
+- Based on searches that run on scheduled intervals or in real-time.
+- Notify you when the results of a search meet defined conditions.
+- Triggered when search is completed.
+
+**Actions:**
+1. Add to triggered alerts
+    - We can set the severity of the alert
+2. Log events
+    - Sent to your splunk deployment for indexing.
+3. Output to lookup
+    - Create or update a csv lookup table.
+4. Send to a telemetry endpoint
+5. Run a script
+    - Runs a file on your system (deprecated)
+6. Send email
+    - We can use splunk tokens to add dynamic data to emails.
+7. Use a webhook
+    - Custom callbacks. Allows to make an alert message pop up in a chat room.
+8. Run a custom alert
+
+Admin users can find prebuilt alert actions by clicking on **manage alert actions** link.
+
+When an alert set to **private** only you (owner) can access (edit, view) it.
+When an alert set to **Shared in App** the results will be displayed to all users of the app.
+
+By default everyone has read access and `power user` has write access to the alert.
+
+**Scheduled Alert Type** allows you to set a schedule and time range for the search to be run.
+We can use `cron`.
+
+**Read-Time Alert Type** will run the search continuously in the background.
+As soon as search conditions are satisfied, an action is triggered.
+Real-Time Alerts may impact your system performance.
+
+**We can trigger an alert**
+- per-result
+- number of results
+- number of hosts
+- number of sources
+- custom (spl)
+
+We can use `Throttle` setting to suppress a few actions into one alert (like email), based on field values or time intervals.
+
+#### Managing Alerts
+**We can** edit alert, edit permissions, disable, clone, or delete an alert.
+Alerts are **private** by default.
+(Similar to reports)
+
 
 ## Notes from Notebook
 ### Data Model {#data-model}
