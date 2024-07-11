@@ -412,6 +412,7 @@ index=sales sourcetype=vendor_sales
 index=* | stats count by purchase
 ```
 
+---
 
 ## Notes from Notebook
 ### Data Model {#data-model}
