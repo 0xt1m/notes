@@ -648,6 +648,92 @@ index=web sourcetype=access_combined
 
 ---
 
+### Formatting Time
+We can define how time is formatted in the search result by using time functions of the `eval` command.
+#### `eval` Date and Time Functions
+```
+...| eval <field>=<expression1>[, <field>=<expression2>]
+```
+- Calculates an expression and puts the resulting value into a new or existing field which can be reused in the search pipeline.
+- Extremely powerful and useful command that supports a vast assortment of functions
+- Can exist as an expression
+
+**`now()`**: returns the time a search was started
+```
+...| eval field1 = now()
+```
+
+**`time()`**: returns the time an event was processed by `eval` command
+```
+...| eval field1 = time()
+```
+
+**`relative_time`**
+```
+...| eval field1 = relative_time(X,Y)
+```
+- Returns an epoch timestamp relative to a supplied time
+- **X** is a number, representing desired time in epoch seconds
+- **Y** is a relative time specifier
+- Relative time specifiers use time unit abbreviations such as:
+    - `s=seconds m=minutes h=hours d=days w=week mon=months y=year`
+
+```
+...| eval yesterday = relative_time(now(), "-1d@h")
+```
+
+**Example:**
+```
+index=sales sourcetype=vendor_sales
+| timechart span=1h sum(price) as hourly_sales
+| eval formatted_time = strftime(_time, "%b %d, %I %p")
+```
+
+We can use `strptime` to get UNIX time from formatted time.
+```
+index=systems sourcetype=system_info asctime=*
+| eval NewAsctime = strptime(asctime, "%Y-%m-%d &H:%M:%S,%N")
+| table asctime, NewAsctime
+```
+
+---
+
+### Using Time Commands
+#### `| timechart`
+- Performs statistical aggregation against time.
+```
+...| timechart <stats-func>(<field>) by <field>
+      [span=<int><timescale>] [limit=<int>]
+```
+
+#### `| timewrap`
+Can compare data over a specific time period, such as day-over-day or month-over-month
+Typically going to follow the `timechart` command
+```
+...| timewrap [<int>]<timescale>
+```
+It will allow us to compare specific time periods to each other.
+*For example looking at number of password failures for the last two weeks looking at each week by week.*
+```
+index=security "failed password" earliest=-14d@d latest=@d
+| timechart span=1d count as Failures
+| timewrap 1w
+| rename _time as Day
+| eval Day = strftime(Day, "%A")
+```
+![timewrap_example.png](splunk_imgs/timewrap_example.png)
+
+---
+
+### Working with Time Zones
+- Remember, `date_*` fields do not reflect your local time, but are the values of time/date directly from the raw events.
+- To determine your time zone:
+    1. In **Preferences**, set **Time Zone** to **Default System Timezone**
+    2. Run a search over the last 15 minutes
+    3. Read the event timestamps and compare with you local time
+
+---
+
 ## Terms
 Data Model
 : A model to associate specific types to.
