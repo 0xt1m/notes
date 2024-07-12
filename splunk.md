@@ -491,16 +491,76 @@ index=web sourcetype=access_combined actions=purchase status=200
 ```
 ![trendline.png](splunk_imgs/trendline.png)
 
-- `timechart`
-- `top`
-- `rare`
-- `contingency`
-- `highlight`
+---
 
-*Examples:*
+### Generating Maps
+Splunk can pull geographic data from your machine data.
+**Marker Maps** plot geographic coordinates as interactive markers on a world map.
+
+#### `| iplocation`
+Used to lookup and add location information from a third party database to an event.
+City, Country, Region, Latitude, Longitude fields can be added to events that contains external ip addresses.
+Those fields can be used later with the `geostats` command to create a map.
 ```
-index=* | stats count by purchase
+index=security sourcetype=linux_secure action=success src_ip!=10.*
+| iplocation src_ip
 ```
+==Some location information may not be available for particular ip addresses.==
+If an ip address is not found in a third party database, no fields will be added to the event.
+
+#### `| geostats`
+Helps aggregate geographical data for use on a map.
+**Uses the functions as the stats commands.**
+```
+index=sales sourcetype=vendor_sales
+| geostats latfield=VendorLatitude longfield=VendorLongitude count
+```
+add `by` argument to split your data.
+**Unlike `stats` command** the geostats command only accepts one by argument.
+To control the column `count` the `globallimit` argument can be used.
+```
+index=sales sourcetype=vendor_sales
+| geostats latfield=VendorLatitude longfield=VendorLongitude count by product_name globallimit=4
+```
+```
+index=security sourcetype=linux_secure action=success src_ip!=10.*
+| iplocation src_ip
+| geostats latfield=lat longfield=lon count 
+```
+
+---
+
+**Choropleth Maps** shading to show relative metrics for predefine geographic regions.
+In order to use this kind of maps we will need `.kmz` - Keyhole Markup Language File that defines region boundaries.
+Splunk ships with 2 KMZ files:
+`geo_us_states.kmz` for the US and `geo_countries.kmz` for the countries of the worlds. However other KMZ files can be used.
+
+#### `| geom`
+To prepare our events for use in a choropleth.
+Adds a field to our events that includes geographical data structures that match polygons on our map.
+When we use `geom` we have to specify the name of the KMZ file and the featureIdField argument.
+```
+index=sales sourcetype=vendor_sales VendorID>=5000 AND VendorID<=5055
+| stats count as Sales by VendorCountry
+| geom geo_countries featureIdField=VendorCountry
+```
+
+---
+
+### Single Value Visualizations
+Displays a single integer
+There are many options for formatting depending on the value.
+We can use `timechart` command to add a trend and sparkline to the visualization.
+We can use `by` and `Trellis` to see each value by each result.
+We can use `gauge` command  to set rages using the Splunk Search Language.
+```
+index=web sourcetype=access_combined action=purchase status=200
+| stats sum(price) as Total
+| gauge Total 0 100000 200000 300000
+```
+Once color format is set it stays persistent over different types of visualization.
+
+
 ---
 
 ## Notes from Notebook
