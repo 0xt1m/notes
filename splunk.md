@@ -564,6 +564,16 @@ When n event is ingested its timestamp is stored in the `_time` field which is u
 
 The `_time` field is stored with the event in the index.
 
+**Default time fields in Splunk:**
+1. `date_hour`
+2. `date_mday`
+3. `date_minute`
+4. `date_month`
+5. `date_second`
+6. `date_wday`
+7. `date_year`
+8. `date_zone`
+
 Timestamps are expressed in *Unix* or *epoch* time. Translated during the search operation process.
 All events are sorted by time, that's why time is the most efficient filter.
 
