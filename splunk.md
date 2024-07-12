@@ -558,6 +558,96 @@ index=web sourcetype=access_combined actions=purchase status=200
 
 ---
 
+## Working with Time
+### Searching with Time
+When n event is ingested its timestamp is stored in the `_time` field which is used to create a timeline in Splunk user interface.
+
+The `_time` field is stored with the event in the index.
+
+Timestamps are expressed in *Unix* or *epoch* time. Translated during the search operation process.
+All events are sorted by time, that's why time is the most efficient filter.
+
+**The timestamp that you see is adjusted to your local timezone** as long as the timezone set in the account settings.
+
+**Time range options:**
+- Presets
+- Relative
+- Real-time
+    - Can impact overall performance
+- Date Range
+- Date & Time Range
+- Advanced
+
+Let's assume now is 09:45 April 1st 2021
+| Relative Time Modifiers | Search |
+|-------------------------------|--------|
+| -30m@h                        | Looks back to 09:00:00 on April 1st 2021  |
+| earliest=-h@h                 | Rounds down to 08:00:00 on April 1st 2021 |
+| earliest=-mon@mon latest=@mon | Looks for events from 00:00:00 on March 1st 2021 to 00:00:00 on April 1st 2021 |
+| earliest=-7d@d                | Looks for events from 00:00:00 on March 25th (7 days before April 1st) to 09:45:00 on April 1st 2021 |
+|earliest=@d+3h                 | Looks for events from 03:00:00 to 09:45:00 on April 1st 2021 |
+
+`@` symbol "snaps" to the time unit you specify and will always round down to the nearest specified unit.
+
+| Relative Time Modifiers | \<timeUnit>                                    |
+|-------------------------|------------------------------------------------|
+| Current date & time     | now                                            |
+| Second                  | s, sec, secs, second, seconds                  |
+| Minute                  | m, min, minute, minutes                        |
+| Hour                    | h, hr, hrs, hour, hours                        |
+| Day                     | d, day, days                                   |
+| Week                    | w, week, weeks                                 |
+| Days of the week        | w1 (Monday)...w6 (Saturday), w7 or w0 (Sunday) |
+| Month                   | mon, month, months                             |
+| Quarter                 | q, qtr, qtrs, quarter, quarters                |
+| Year                    | y, yr, yrs, year, years                        |
+
+We can use `earliest` and `latest` in the search line.
+```
+index=security sourcetype=linux_secure fail* password earliest=-5m@m latest=now
+```
+The specified time in the search line **is more important** than the time that is set in the Time Range Picker.
+
+Time shown by Splunk UI may different from the raw data if the timezone is different.
+If Splunk does not find time in the raw data it will assign the time of creating the index to all of the events.
+```
+index=sales sourcetype=vendor_sales earliest=-2d@d latest=@d date_hour>=2 AND date_hour<5
+| bin span=1h _time
+| stats sum(price) as "Hourly Sales" by _time
+| eval Hour = strftime(_time, "%b %d, %I %p") # month, day of the month, hour, am/pm
+| table Hour, "Hourly Sales"
+```
+
+```
+...| bin _time [span=<int><timescale>] [as <newfield>]
+```
+The `bin` command is used to help us bucket up our events.
+`bin` Command: **`<timescale>`** Values
+| Time Scale     | Syntax                                |
+|----------------|---------------------------------------|
+| `<sec>`        | s \| sec \| secs \| second \| seconds |
+| `<hr>`         | m \| min \| mins \| minute \| minutes |
+| `<day>`        | d \| day \| days                      |
+| `<month>`      | mon \| month \| months                |
+| `<subseconds>` | us \| ms \| cd \| ds                  |
+
+```
+index=web sourcetype=access_combined
+| stats sum(price) as revenue by product_name
+| bin revenue span=5000
+```
+![bin_command.png](splunk_imgs/bin_command.png)
+
+```
+index=web sourcetype=access_combined
+| stats sum(price) as revenue by product_name
+| bin revenue span=5000
+| stats list(product_name) as product_name by revenue
+| eval revenue = "$".revenue
+```
+
+---
+
 ## Terms
 Data Model
 : A model to associate specific types to.
