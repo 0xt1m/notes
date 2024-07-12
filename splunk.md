@@ -560,6 +560,20 @@ index=web sourcetype=access_combined action=purchase status=200
 ```
 Once color format is set it stays persistent over different types of visualization.
 
+### Visual Formatting
+```
+index=web sourcetype=access_combined file=*
+| chart sum(bytes) over host by file
+```
+We can highlight the high and low values in the table by setting data overlay. 
+We can show or hide *Totals* and *Percentages* by formatting through user interface.
+
+**Chart Overlay** is very handy when using trendline.
+```
+index=web sourcetype=access_combined actions=purchase status=200
+| timechart sum(price) as sales
+| trendline wma2(sales) as trend
+```
 
 ---
 
