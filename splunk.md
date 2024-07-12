@@ -356,7 +356,7 @@ index=sales sourcetype=vendor_sales product_name=*
 Any search that returns statistical values can be viewed as a chart.
 
 **Most visualizations require result structure as tables with at least to columns.**
-The first columns provides the `x` axes values and the second column provides the `y`.
+The first columns provides the x-axis values and the second column provides the `y`.
 
 #### Transforming commands
 Order search results into a data table. They can be used for a statistical purposes.
@@ -393,14 +393,104 @@ index=sales sourcetype=vendor_sales
 # It will show the top 3 product sales by each vendor
 ```
 
-- `stats`
-    - `count`
-    - `sum`, `avg`, `max`, `min`
-    - `values`
-    - `list`
-    - `dc`
-    - `first`, `last`
-- `chart`
+##### `| rare`
+Same as `| top`, but it show the least common values.
+You can also use `by` clause with this command.
+
+##### `| stats`
+To produce statistics from our search results. 
+*Common `stats` functions:*
+1. count
+2. distinct count
+3. sum
+4. average
+5. min
+6. max
+7. list
+8. values
+
+```
+index=sales sourcetype=vendor_sales
+| stats count
+```
+To change the name of the count column we use `as` clause.
+```
+...
+| stats count as "Total Sales by Vendors"
+```
+We can add `by` clause to return the count for each field value of the named fields.
+We can add any number of fields to split the count.
+```
+...
+| stats count as "Total Sales by Vendors" by product_name, categoryId, sale_price
+```
+![stats_count_as_by](splunk_imgs/stats_count_as_by.png)
+
+By adding a field as an argument to the `count` function we can get a count of the number of events where the field is present.
+```
+...
+| stats count(field)
+```
+
+##### `| chart`
+Takes 2 clause statements. `over` and `by`.
+`over` tells splunk which fields you want to be on the x-axis.
+Any `stats` function can be applied to `chart` command. 
+![chart_count_over.png](splunk_imgs/chart_count_over.png)
+
+We can split the data by which host the error occurred on. Adding `by host` to our search.
+```
+index=web sourcetype=access_combined status>299
+| chart count over status by host
+```
+
+If two `by` clauses are used without using the `over` clause. The first field will be taken as the `over` clause.
+![chart_count_by.png](splunk_imgs/chart_count_by.png)
+
+We can add
+```
+usenull=false   # to remove null column
+useother=false  # to remove other column
+limit=5         # to adjust number of plotted series shown. Set 0 to display all products
+```
+
+##### `| timechart`
+Performs stats aggregation against time. Time is always the x-axis.
+Any `stats` function can be applied to `timechart` command.
+To see a timeline of `vendor_sales`
+```
+index=sales sourcetype=vendor_sales
+| timechart count
+```
+Add `by` clause to split the data by `product_name`. Only 1 values can be specified after `by` modifier. `limit`, `useother`, `usenull` are also available.
+
+Use `span` to put the data in different time range groups.
+```
+index=sales sourcetype=vendor_sales
+| timechart span=12hr sum(price) by product_name limit=0
+```
+
+##### `| trendline`
+Computes moving averages of field values. 
+Requires 3 arguments: 
+1. Trendtype
+    - simple moving average (sma)
+    - exponential moving average (ema)
+    - weighted moving average (wma)
+2. You need to define a period of time to use for computing the trend.
+    - Integer between 2 and 10 000
+    - `wma2` - `wma100` - `wma10000`
+    - The number is the number of days.
+3. Define a field to calculated the trend from.
+    - `wma2(field)` - `wma2(sales)`
+
+```
+index=web sourcetype=access_combined actions=purchase status=200
+| timechart sum(price) as sales
+| trendline wma2(sales) as trend
+```
+![trendline.png](splunk_imgs/trendline.png)
+
 - `timechart`
 - `top`
 - `rare`
@@ -411,7 +501,6 @@ index=sales sourcetype=vendor_sales
 ```
 index=* | stats count by purchase
 ```
-
 ---
 
 ## Notes from Notebook
