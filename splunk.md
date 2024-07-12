@@ -1,25 +1,6 @@
 # Splunk
-
-## Table of Contents {#contents}
-- [Knowledge Objects](#knowledge-objects)
-    - [Naming Conventions](#naming-conventions)
-    - [Permissions](#permissions)
-- [Using Fields](#using-fields)
-    - [Field Operators](#field-operators)
-    - [`| fields`](#fields-command)
-    - [`| rename`](#rename-command)
-    - [Index vs Search Time](#index-vs-searchtime)
-    - [`| eval`](#eval-command)
-    - [Field Extraction](#field-extraction)
-    - [Enriching Data With Knowledge Objects](#enriching-data-ko)
-- [Scheduling Reports & Alerts](#reports-alerts)
-    - [Reports](#reports)
-    - [Alerts](#alerts)
-
----
-
-## Knowledge Objects {#knowledge-objects}
-*Help you to discover and analyze your data.*
+## Knowledge Objects
+*Knowledge objects help you to discover and analyze your data.*
 
 | Name | Functions |
 |-------------|------------------------------------|
@@ -38,7 +19,7 @@
 
 ---
 
-### Naming Conventions {#naming-conventions}
+### Naming Conventions
 *Help understand what each knowledge object does.*
 **6 segments of keys:**
 1. Group
@@ -63,7 +44,7 @@ IPwhoisAction = Description
 
 ---
 
-### Permissions {#permissions}
+### Permissions
 Private
 : When `user` creates and object it is automatically set to private. It is only available to that  user.
 
@@ -77,7 +58,7 @@ All Apps
 
 ---
 
-## Using Fields {#using-fields}
+## Using Fields
 Selected Fields
 : Fields of the utmost importance to you.
 
@@ -89,7 +70,7 @@ Interesting Fields
 
 ---
 
-### Field Operators {#field-operators}
+### Field Operators
 *String and Numerical:*
 - `=`, `!=`
 
@@ -113,7 +94,7 @@ index=web status IN ("500", "503", "505") === index=web (status=500 OR status=50
 
 ---
 
-### `| fields` {#fields-command}
+### `| fields`
 Used to include or exclude fields from your search.
 ```
 index=web status IN ("500", "503", "505")
@@ -127,7 +108,7 @@ Filtering fields as early as possible is the best practice.
 
 ---
 
-### `| rename` {#rename-command}
+### `| rename`
 Used to rename field in your search.
 You can give more meaningful or user friendly names to your fields.
 ==Once you've used rename command the original field name would no longer be available==
@@ -140,10 +121,10 @@ index=web status IN ("500", "503", "505")
 
 ---
 
-### Index vs Search Time {#index-vs-searchtime}
+### Index vs Search Time 
 **Index**
-When Splunk ingests data into the index a select number of fields are automaticaly extracted. 
-These include `host`, `soucetype`, `source`.
+When Splunk ingests data into the index a select number of fields are automatically extracted. 
+These include `host`, `sourcetype`, `source`.
 Internal fields: `_time`, `_raw`.
 
 **Search Time**
@@ -168,7 +149,7 @@ index=network sourcetype=cisco_wsa_squid
 #### `| erex`
 Automatic field extractor. We give it a sample of values and Splunk will try to extract what we want.
 ```
-index=games soucetype=SimCubeBeta
+index=games sourcetype=SimCubeBeta
 | erex Character from field=_raw examples="pixie, Kooby"
 ```
 We can see the regular expression Splunk uses by clicking on the job menu.
@@ -240,10 +221,10 @@ We can also disable, clone, embed, move, or delete a report.
 - Users with the `power` role are able to display the report for themselves or to the other users of the app.
 - Users with the `admin` role are able to display the report in all apps.
 
-Embeding
+Embedding
 : Getting html code to display a report on a web page.
 
-Once embeding is enabled, we will no longer be able to edit attributes for the report.
+Once embedding is enabled, we will no longer be able to edit attributes for the report.
 
 We can add scheduled report to a dashboard.
 
@@ -577,14 +558,14 @@ index=web sourcetype=access_combined actions=purchase status=200
 
 ---
 
-## Notes from Notebook
-### Data Model {#data-model}
-A model to associate specific types to.
-Data model :arrow_right: Data set :arrow_right: subset.
+## Terms
+Data Model
+: A model to associate specific types to.
+: Data model :arrow_right: Data set :arrow_right: subset.
 
-### CIM {#cim}
-Common Information model.
-A model. Data normalization.
+Lookup
+: Adding data from external sources.
 
-### Lookup {#lookup}
-Adding data from external sources.
+CIM
+: Common Information Model.
+: A model. Data normalization.
