@@ -132,7 +132,25 @@ Splunk will automatically extract fields from your data.
 
 ---
 
-### `| eval` {#eval-command}
+### `| eval`
+```
+...| eval <field1>=<expression1>[, <field2>=<expression2>]
+```
+
+- Calculates an expression and puts the resulting values into a new field or overwrites an existing field
+- Fields created by `eval` can be reused in the search pipeline
+- Extremely useful command that supports a vast assortment of functions for performing specific tasks
+- Can exist as a nested function in certain scenarios
+
+==No change to your data is permanent==
+
+| Type          | Operators             |
+|---------------|-----------------------|
+| arithmetic    | `+ - * / %`           |
+| concatenation | `+ .`                 |
+| Boolean       | `AND OR NOT XOR`        |
+| comparison    | `< > <= >= != = LIKE` |
+
 ```
 index=network sourcetype=cisco_wsa_squid
 | stats sum(sc_bytes) as Bytes by usage
@@ -143,9 +161,50 @@ index=network sourcetype=cisco_wsa_squid
 # bandwidth will have megabytes based on bytes.
 ```
 
+```
+index=network sourcetype=cisco_wsa_squid
+| stats sum(sc_bytes) as bytes by usage
+| eval bandwidth = bytes/(1024*1024)
+| eval bandwidth = round(bandwidth, 2)
+```
+
+**Commonly used `eval` functions:**
+<table>
+  <tr>
+    <th>Category</th>
+    <th>Function Syntax</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td rowspan="2">Mathematical</td>
+    <td><code>round(X, Y)</code></td>
+    <td>Rounds X to Y decimal places, otherwise returns X as a whole number</td>
+  </tr>
+  <tr>
+    <td><code>pow(X, Y)</code></td>
+    <td>Returns X to the power of Y</td>
+  </tr>
+  <tr>
+    <td rowspan="3">Statistical</td>
+    <td><code>max(X, ...)</code></td>
+    <td>Takes an arbitrary number of arguments and returns the maximum</td>
+  </tr>
+  <tr>
+    <td><code>min(X, ...)</code></td>
+    <td>Takes an arbitrary number of arguments and returns the minimum</td>
+  </tr>
+  <tr>
+    <td><code>random()</code></td>
+    <td>Takes no arguments and returns a random integer</td>
+  </tr>
+</table>
+
+There are **11** categories of evaluation functions:
+Conversion, Comparison and Conditional, Mathematical, Informational, Statistical, Text, ext.
+
 ---
 
-### Field Extraction {#field-extraction}
+### Field Extraction 
 #### `| erex`
 Automatic field extractor. We give it a sample of values and Splunk will try to extract what we want.
 ```
@@ -167,7 +226,7 @@ index=games sourcetype=SimCubeBeta
 
 ---
 
-### Enriching Data With Knowledge Objects {#enriching-data-ko}
+### Enriching Data With Knowledge Objects
 #### Calculated Fields
 We can create a calculated field for example with bytes to convert it to megabytes and it will convert bytes to megabytes every time it finds bytes.
 Make sure the field was extracted before you try to use it.
@@ -184,8 +243,8 @@ Field Extractions :arrow_right: Field Aliases :arrow_right: Calculated Fields :a
 
 ---
 
-## Scheduling Reports & Alerts {#reports-alerts}
-### Reports {#reports}
+## Scheduling Reports & Alerts 
+### Reports 
 It is basically a search string that runs on a scheduled intervals.
 
 Runs on a scheduled interval. Every time a scheduled report is run it can automatically send an email or trigger different actions.
@@ -850,6 +909,19 @@ index=network sourcetype=cisco_wsa_squid
 index=security sourcetype=linux_secure vendor_action=*
 | timechart span=15m count by vendor_action
 ```
+
+---
+
+### Transforming Commands Summary
+| Feature                            | `chart`      | `timechart`  | `stats` |
+|------------------------------------|--------------|--------------|---------|
+| `by` clause arguments              | 2            | 1            | many    |
+| Limit series shown                 | `limit=int`  | `limit=int`  | NA      |
+| Filter other series                | `useother=t` | `useother=t` | NA      |
+| Filter null values                 | `usenull=t`  | `usenull=t`  | NA      |
+| Set values groups along the x-axis | `span`       | `span`       | NA      |
+
+Result of `stats` command is usually meant to be a table when results of `chart` and `timechart` commands are often meant to be visualizations.
 
 
 ---
