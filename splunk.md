@@ -141,8 +141,6 @@ index=web sourcetype=access_combined
 | table PROD*
 ```
 
-
-
 ---
 
 ### Index vs Search Time 
