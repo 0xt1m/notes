@@ -413,6 +413,11 @@ By adding a field as an argument to the `count` function we can get a count of t
 | stats count(field)
 ```
 
+```
+index=security sourcetype=linux_secure
+| stats count(vendor_action) as ActionEvents, count as TotalEvents
+```
+
 ##### `| chart`
 Takes 2 clause statements. `over` and `by`.
 `over` tells splunk which fields you want to be on the x-axis.
@@ -744,7 +749,115 @@ index=security "failed password" earliest=-14d@d latest=@d
 
 ---
 
+## Statistical Processing
+Data Series
+: Sequence of related data points that are plotted in a visualization.
+
+**3 Types of data series:**
+- *Single-series:* Compares values of of a single data category.
+- *Multi-series:* Compares values of 2 or more data categories.
+- *Time-series:* Compares values over time. Can be single or multi-series.
+
+Transforming commands can be used in searches to organize our results into a statistical table containing a data series that can be visualized. 
+
+### `| chart`
+```
+...| chart <stats-func>(<wc-field>) over <row-split> [by <column-split>] [span=<int><timescale>][limit=<int>] [useother=<bool>] [usenull=<bool>]
+```
+- Returns results in a table format that can be displayed as a visualization
+- Specify the y-axis with `<stats-func>(<wc-field>)`
+    - `<wc-field>` is a field with numeric values; supports wildcards
+    - `<stats-func>` is a supported statistical function
+- Specify x-axis with `over <row-split>`
+- Further split data by including `by <column-split>`
+- Control behavior with `span`, `useother`, and `usenull`
+
+**`chart` Command: `split` Fields**
+- Use `over <row-split>` to specify the x-axis and create a single-series data series
+- Further split results and create a multi-series data series by adding `by <column-split>`
+    - Splits results of `<stats-func>(<wc-field>)`
+    - May alter the range of the y-axis
+- Results can only be split using 2 fields
+- Alternative syntax: `by` clause with 2 arguments
+```
+...| chart <stats-func>(<wc-field>) by <row-split> <column-split>
+```
+*Example 1:*
+```
+# single-series
+index=security sourcetype=linux_secure
+| chart count by vendor_action
+```
+```
+# multi-series
+index=security sourcetype=linux_secure
+| chart count by vendor_action user
+```
+
+*Example 2:*
+```
+# single-series
+index=sales sourcetype=vendor_sales VendorID<4000
+| chart count over VendorCountry
+```
+```
+# multi-series
+index=sales sourcetype=vendor_sales VendorID<4000
+| chart count over VendorCountry by product_name
+```
+
+By adding `limit=5` it would show only top 5 values for `product_name` appear as their own individual column. Any values that are less frequent than 5 would go to the `other` column.
+
+**`chart` Command: `span` Option**
+- If the `<row-split>` field (x-axis) is numeric, use the `span` option with the `chart` command to group events into buckets
+- Splunk shifts overlapped values to the higher grouping.
+
+For example the status code of 400 would be bucketed in a 400-500 range.
+```
+index=web sourcetype=access_combined
+| chart span=100 count over status by host
+```
+
+### `| timechart`
+Performs stats aggregations against time. Time is always the x-axis. With this command we can return time-series chart or table.
+- `<stats-func>(<field>)` applies a function to a single field and populates the y-axis.
+    - if using the `count` function, a field does not need to be specified.
+
+**`timechart` Command**
+```
+...| timechart <stats-func>(<field>) by <split-by-field> [span=<int><timescale>] [limit-<int>]
+```
+`timechart` supports only single additional split.
+
+*Example 1:*
+```
+index=network sourcetype=cisco_wsa_squid
+| timechart count
+```
+*Example 2:*
+```
+index=network sourcetype=cisco_wsa_squid
+| timechart count by usage
+```
+
+**`timechart` Command: `span` Option**
+- The `timechart` command "buckets" the values of the `_time` field based on time range you use if no `span` argument is specified
+- Examples:
+    1. Last 60 minutes defaults to `span=1m`
+    2. Last 24 hours defaults to `span=30m`
+
+```
+index=security sourcetype=linux_secure vendor_action=*
+| timechart span=15m count by vendor_action
+```
+
+
+---
+
 ## Terms
+Data Series
+: Sequence of related data points that are plotted in a visualization.
+
 Data Model
 : A model to associate specific types to.
 : Data model :arrow_right: Data set :arrow_right: subset.
@@ -755,3 +868,4 @@ Lookup
 CIM
 : Common Information Model.
 : A model. Data normalization.
+
