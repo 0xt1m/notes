@@ -109,6 +109,11 @@ Filtering fields as early as possible is the best practice.
 ---
 
 ### `| rename`
+```
+...| rename <field> as <newfield>
+```
+When including spaces or special characters in filed names, use double quotes, `" "`
+
 Used to rename field in your search.
 You can give more meaningful or user friendly names to your fields.
 ==Once you've used rename command the original field name would no longer be available==
@@ -118,6 +123,25 @@ index=web status IN ("500", "503", "505")
 | stats count by status
 | rename status as "HTTP Status", count as "Number of Events"
 ```
+
+- We can rename multiply fields within the same `rename` command
+```
+index=web sourcetype=access_combined
+| table clientip, action, productId, status
+| rename productId As ProductID, 
+action AS "Customer Action",
+status AS "HTTP Status"
+```
+
+- We can use wildcards to rename multiply fields that match a pattern.
+```
+index=web sourcetype=access_combined
+| table productId, product_name
+| rename product* AS PROD*
+| table PROD*
+```
+
+
 
 ---
 
@@ -201,6 +225,15 @@ index=network sourcetype=cisco_wsa_squid
 
 There are **11** categories of evaluation functions:
 Conversion, Comparison and Conditional, Mathematical, Informational, Statistical, Text, ext.
+
+`eval` can also be used as a function with the `stats` command.
+```
+index=security sourcetype=linux_secure vendor_action=*
+| stats count(eval(vendor_action="Accepted")) as Accepted, 
+count(eval(vendor_action="Failed")) as Failed,
+count(eval(vendor_action="session opened")) as SessionOpened
+```
+- Requires an as clause to rename the field.
 
 ---
 
@@ -819,6 +852,25 @@ Data Series
 
 Transforming commands can be used in searches to organize our results into a statistical table containing a data series that can be visualized. 
 
+### `| sort`
+```
+...| sort (-|+) <field> [limit=<int> | <int>]
+```
+- Sorts in ascending order by default
+- Limit results returned with the `limit` option or just include a number
+- Determines field type then determines sorting type:
+    - Alphabetic strings = lexicographic sort
+        - Upper case letters appear before lowercase.
+    - Numeric = numerical sort
+    - Combination = lexicographic or numeric sort based on first character.
+
+```
+index=sales sourcetype=vendor_sales Vendor=Bea*
+| dedup Vendor, VendorCity
+| table Vendor, VendorCity, VendorStateProvince, VendorCountry
+| sort - Vendor
+```
+
 ### `| chart`
 ```
 ...| chart <stats-func>(<wc-field>) over <row-split> [by <column-split>] [span=<int><timescale>][limit=<int>] [useother=<bool>] [usenull=<bool>]
@@ -922,7 +974,6 @@ index=security sourcetype=linux_secure vendor_action=*
 | Set values groups along the x-axis | `span`       | `span`       | NA      |
 
 Result of `stats` command is usually meant to be a table when results of `chart` and `timechart` commands are often meant to be visualizations.
-
 
 ---
 
