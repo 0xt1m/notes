@@ -990,3 +990,8 @@ CIM
 : Common Information Model.
 : A model. Data normalization.
 
+SPL
+: Search Processing Language
+
+
+
