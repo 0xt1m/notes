@@ -6,10 +6,17 @@
 
 ## Exam Contents
 ### Splunk Basics
-1. Splunk Components +-
+1. Splunk Components +
+    - Indexer
+    - Search Head
+    - Forwarder
+    - Deployment server
+    - Functions at a glance
+    - Index replication and indexer clusters
 2. Understand the uses of Splunk +
-3. Define Splunk apps -
-4. Customizing user settings -
+3. Define Splunk apps +
+    - A Splunk app is an extension of Splunk functionality. Splunk apps are made up of different Splunk knowledge objects.
+4. Customizing user settings +
 5. Basic naviagation in Splunk +
 
 ### Basic Searching
@@ -19,7 +26,11 @@
 4. Refine searches +
 5. Use the timeline +
 6. Work with events +
-7. Control a search job +-
+7. Control a search job +
+    - Each time a run a search, create a pivot, open a report or load a dashboard panel, Splunk software creates a Job in the system.
+    - Jobs page to review and manage any job that you own.
+    - Default lifetime of a job is 10 minutes.
+    - Activity > Jobs
 8. Save search results +
 
 ### Using Fields in Searches
@@ -41,18 +52,23 @@
 ### Creating Reports and Dashboards
 1. Save a search as a report +
 2. Edit reports +
-3. Create reports that dsplay statistics (table) +
+3. Create reports that display statistics (table) +
 4. Create repports that display visualizations (charts) +
 5. Create a dashboard +
 6. Add a report to a dashboard +
 7. Edit a dashboard +
 
 ### Creating and Using Lookups
-1. Describe lookups -
-2. Examine a lookup file example -
-3. Create a lookup file and create a lookup definition -
-4. Configure an automatic lookup -
-5. Use the lookup in searches -
+1. Describe lookups +
+    - Lookups enrich your data by adding field-value combination from lookup tables.
+2. Examine a lookup file example +
+3. Create a lookup file and create a lookup definition +
+    - Lookup definition - The part of the lookup configuration that defines the data type and connection parameters used when comparing event fields.
+4. Configure an automatic lookup +
+    - Manual lookups called with the `lookup` command
+    - Automatic lookups are run everytime we run a search. "Applied to all searches at a search time."
+5. Use the lookup in searches
+    - To use lookup in searches we use `lookup` command
 
 ### Creating Scheduled Reports and Alerts
 1. Describe scheduled reports +
