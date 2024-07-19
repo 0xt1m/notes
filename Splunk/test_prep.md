@@ -76,3 +76,7 @@
 3. Describe alerts + 
 4. Create alerts +
 5. View fired alerts +
+
+## Splunk General Information
+- Splunk Enterprise is being shipped with the Home App and Search & Reporting App
+- Splunk forwarder runs on 9997
